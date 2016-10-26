@@ -1,0 +1,72 @@
+{
+  "properties": {
+    "Airport": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "Terminal": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "Date": {
+      "type": "date",
+      "format":"dd/MM/YY"
+    },
+    "Hour": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
+    "Average": {
+      "type": "short",
+      "store": "true"
+    },
+    "Max": {
+      "type": "short",
+      "store": "true"
+    },
+    "0-15": {
+      "type": "short",
+      "store": "true"
+    },
+    "16-30": {
+      "type": "short",
+      "store": "true"
+    },
+    "31-45": {
+      "type": "short",
+      "store": "true"
+    },
+    "46-60": {
+      "type": "short",
+      "store": "true"
+    },
+    "61-90": {
+      "type": "short",
+      "store": "true"
+    },
+    "91-120": {
+      "type": "short",
+      "store": "true"
+    },
+    "121Plus": {
+      "type": "short",
+      "store": "true"
+    },
+    "Excluded": {
+      "type": "short",
+      "store": "true"
+    },
+    "Total": {
+      "type": "short",
+      "store": "true"
+    },
+    "Flights": {
+      "type": "short",
+      "store": "true"
+    },
+    "Booths": {
+      "type": "short",
+      "store": "true"
+    }
+  }
+}
