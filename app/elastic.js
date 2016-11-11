@@ -12,11 +12,23 @@ var client = new es.Client({
 exports.esClient = function () {
     return client;
 };
-
-exports.setMappings = function() {
-    var mappings = JSON.parse(fs.readFileSync('/Users/hp/workbench/projects/cbp/wait-times/www/conf/mappings.json', 'utf8'));
-    client.indices.create({index:"cbp"});
-    client.indices.putMapping({index:"cbp", body:mappings,updateAllTypes:true, type:'wait-times'}, function(val){
-        console.log(val)
+exports.createIndex = new Promise(function(resolve, reject) {
+    client.indices.create({index:"cbp"}, function(err, response, status){
+        if (err) {
+            reject(response);
+        } else {
+            resolve(response);
+        }
     });
-};
+});
+
+exports.setMappings = new Promise(function(resolve, reject) {
+    var mappings = JSON.parse(fs.readFileSync('/Users/hp/workbench/projects/cbp/wait-times/www/conf/mappings.json', 'utf8'));
+    client.indices.putMapping({index:"cbp", body:mappings,updateAllTypes:true, type:'wait-times'}, function(err, response, status){
+        if (err) {
+            reject(response);
+        } else {
+            resolve(response);
+        }
+    });
+});

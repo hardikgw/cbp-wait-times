@@ -3,7 +3,7 @@ var parse = require('csv-parse');
 var es = require('./elastic');
 var _ = require('lodash');
 
-exports.getData = function() {
+exports.getData = new Promise(function(resolve, reject) {
     var rs = fs.createReadStream('/Users/hp/workbench/projects/cbp/wait-times/data/ATL.csv');
     parser = parse({columns: true}, function (err, data) {
         for (var i=0;i<data.length;i++) {
@@ -18,7 +18,8 @@ exports.getData = function() {
                 console.log(error);
             });
         }
+        resolve('done');
     });
     rs.pipe(parser);
-};
+});
 
