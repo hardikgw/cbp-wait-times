@@ -7,7 +7,7 @@ var ingest = require('./ingest');
 var app = express();
 
 app.get('/', function (req, res) {
-    res.send('Hello World!');
+    res.send('CBP Wait Times');
 });
 
 app.listen(3000, function () {

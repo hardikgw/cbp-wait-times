@@ -10,7 +10,7 @@
     },
     "Date": {
       "type": "date",
-      "format":"dd/MM/YY"
+      "format":"MM/dd/YY"
     },
     "Hour": {
       "type": "string",

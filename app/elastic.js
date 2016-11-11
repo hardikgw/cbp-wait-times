@@ -1,11 +1,12 @@
-'use strict'
+'use strict';
 
 var es = require('elasticsearch');
 var fs = require('fs');
 
 var client = new es.Client({
     host: 'localhost:9200',
-    log: 'trace'
+    log: 'error',
+    requestTimeout: 160000
 });
 
 exports.esClient = function () {
