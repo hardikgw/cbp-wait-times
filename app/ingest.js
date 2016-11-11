@@ -10,7 +10,7 @@ var getAirports = function() {
         var rs = fs.createReadStream(basePath + '/airports/airports.csv');
         var airportparser = parse({columns: true});
         airportparser.on('readable', function () {
-            var USAirports = ['US', 'GU', 'PR'];
+            var USAirports = ['US', 'AS', 'GU', 'MP', 'PR', 'CA'];
             while (airport = airportparser.read()) {
                 if (USAirports.indexOf(airport.country_code)>-1) {
                     var cleanairport = _.omitBy(airport, _.isEmpty);
@@ -33,14 +33,13 @@ var getAirports = function() {
     });
 };
 
-var getData = function(file, airports) {
+var getData = function(file, airports, callback) {
     var errors = [];
     var created = 0;
     var errored = 0;
     var parser = parse({columns: true}, function (err, data) {
         for (var i=0;i<data.length;i++) {
             var waittime = _.omitBy(data[i], _.isEmpty);
-            console.log(waittime.Airport);
             waittime["location"] = {
                 lat: airports[waittime.Airport].lat,
                 lon: airports[waittime.Airport].lon
@@ -51,13 +50,11 @@ var getData = function(file, airports) {
                 timeout: -1,
                 id: (waittime.Airport + waittime.Terminal + '_' + waittime.Date.replace(/\//g, '_') + '_' + waittime.Hour.replace(/ /g,'')).replace(/ /g,'_'),
                 body: waittime
-            }, function (error, response) {
-                if (error) {
-                    errors.push({ error : error});
-                    errored ++;
-                } else {
-                    created ++;
-                }
+            }).then((res) => {
+                created++
+            }, (err) => {
+                errors.push({ error : error});
+                errored ++;
             });
         }
     });
@@ -66,7 +63,7 @@ var getData = function(file, airports) {
         reject(err);
     });
     parser.on('finish', function(){
-        return {created:created,errrored:errored,errors:errors};
+        console.log({created:created,errrored:errored,errors:errors});
     });
 
     var datafiles = [];
@@ -75,15 +72,24 @@ var getData = function(file, airports) {
     rs.pipe(parser);
 };
 
-
-
 module.exports.ingest = function(){
     getAirports().then((val) => {
         var files = fs.readdirSync(basePath);
+        _.remove( files, function ( file ) {
+            return !file.endsWith('.csv')
+        });
+        // var x = 0;
+        // var loopArray = function(arr) {
+        //     getData(arr[x],val,function(){
+        //         x++;
+        //         if(x < arr.length) {
+        //             loopArray(arr);
+        //         }
+        //     });
+        // };
+        // loopArray(files);
         files.forEach((file) => {
-            if (file.endsWith(".csv")) {
-                getData(file, val);
-            }
+            getData(file, val);
         });
     });
 };

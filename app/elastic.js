@@ -5,7 +5,7 @@ var fs = require('fs');
 
 var client = new es.Client({
     host: 'localhost:9200',
-    log: 'debug',
+    log: 'error',
     requestTimeout: 160000
 });
 
