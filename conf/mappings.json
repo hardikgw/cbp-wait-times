@@ -67,6 +67,9 @@
     "Booths": {
       "type": "short",
       "store": "true"
+    },
+    "location": {
+      "type": "geo_point"
     }
   }
 }

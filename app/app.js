@@ -12,15 +12,28 @@ app.get('/', function (req, res) {
 
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
-    es.createIndex.then(
-      function (val) {
-          console.log(val);
-      }
-    ).then(
-    es.setMappings.then(
-        function (val) {
-            console.log(val);
-        }
-    )).then(
-    ingest.getData);
+});
+
+app.get('/index', function (req, res) {
+    res.send(ingest.ingest());
+});
+
+app.get('/mapping', function(req,rsp) {
+    es.createIndex()
+        .then((response) => {
+            console.log(response)
+            es.setMappings().then(
+                (response) => {
+                    console.log(response);
+                    rsp.send(response);
+                },
+                (err) => {
+                    console.log(err);
+                    rsp.send(err);
+                }
+            )
+        }, (err) =>{
+            console.log(err);
+            rsp.send(err);
+        });
 });
