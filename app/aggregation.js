@@ -5,53 +5,52 @@ var _ = require('lodash');
 var basePath = '/Users/hp/workbench/projects/cbp/wait-times/data';
 
 
-
-var rowsByAirportPerDay = function() {
+var rowsByAirportPerDay = function () {
     var filename = basePath + '/WaitTimesPerDay.csv';
     fs.writeFileSync(filename, "Airport,Date,AvgWait,MaxWait,Booths,Lat,Lon" + "\n");
     es.esClient().search({
         index: 'cbp',
         size: 0,
         body: {
-            query : {
-                match_all : {}
+            query: {
+                match_all: {}
             },
             aggs: {
                 airport: {
                     terms: {
                         field: "Airport",
-                        size : 1000
+                        size: 1000
                     },
                     aggs: {
                         date: {
                             terms: {
                                 field: "Date",
-                                size : 5000
+                                size: 5000
                             },
-                            aggs : {
-                                _Average : {
-                                    avg : {
-                                        field : "Average"
+                            aggs: {
+                                _Average: {
+                                    avg: {
+                                        field: "Average"
                                     }
                                 },
-                                _Max : {
-                                    avg : {
-                                        field : "Max"
+                                _Max: {
+                                    avg: {
+                                        field: "Max"
                                     }
                                 },
-                                _Booths : {
-                                    avg : {
-                                        field : "Booths"
+                                _Booths: {
+                                    avg: {
+                                        field: "Booths"
                                     }
                                 },
-                                _Lat : {
-                                    avg : {
-                                        field : "lat"
+                                _Lat: {
+                                    avg: {
+                                        field: "lat"
                                     }
                                 },
-                                _Lon : {
-                                    avg : {
-                                        field : "lon"
+                                _Lon: {
+                                    avg: {
+                                        field: "lon"
                                     }
                                 }
                             }
@@ -60,10 +59,10 @@ var rowsByAirportPerDay = function() {
                 }
             }
         }
-    }).then((results)=>{
+    }).then((results)=> {
         var airports = results.aggregations.airport.buckets;
         airports.forEach((airport) => {
-            airport.date.buckets.forEach((date)=>{
+            airport.date.buckets.forEach((date)=> {
                 var fields = [];
                 fields.push(airport.key);
                 fields.push(date.key_as_string);
@@ -76,14 +75,102 @@ var rowsByAirportPerDay = function() {
             });
         });
         return "done";
-    },(err)=> {
+    }, (err)=> {
         console.log(err);
         return (err)
     });
 };
 
 
+var rowsByAirportPerHour = function () {
+    var filename = basePath + '/WaitTimesPerHour.csv';
+    fs.writeFileSync(filename, "Airport,Date,Hour,AvgWait,MaxWait,Booths,Lat,Lon" + "\n");
+    es.esClient().search({
+        index: 'cbp',
+        size: 0,
+        body: {
+            query: {
+                match_all: {}
+            },
+            aggs: {
+                airport: {
+                    terms: {
+                        field: "Airport",
+                        size: 1000
+                    },
+                    aggs: {
+                        date: {
+                            terms: {
+                                field: "Date",
+                                size: 5000
+                            },
+                            aggs: {
+                                hour: {
+                                    terms: {
+                                        field: "Hour",
+                                        size: 25
+                                    },
+                                    aggs: {
+                                        _Average: {
+                                            avg: {
+                                                field: "Average"
+                                            }
+                                        },
+                                        _Max: {
+                                            avg: {
+                                                field: "Max"
+                                            }
+                                        },
+                                        _Booths: {
+                                            avg: {
+                                                field: "Booths"
+                                            }
+                                        },
+                                        _Lat: {
+                                            avg: {
+                                                field: "lat"
+                                            }
+                                        },
+                                        _Lon: {
+                                            avg: {
+                                                field: "lon"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }).then((results)=> {
+        results.aggregations.airport.buckets.forEach((airport) => {
+            airport.date.buckets.forEach((date)=> {
+                date.hour.buckets.forEach((hour)=> {
+                    var fields = [];
+                    fields.push(airport.key);
+                    fields.push(date.key_as_string);
+                    fields.push(hour.key);
+                    fields.push(hour._Average.value);
+                    fields.push(hour._Max.value);
+                    fields.push(hour._Booths.value);
+                    fields.push(hour._Lat.value);
+                    fields.push(hour._Lon.value);
+                    fs.appendFileSync(filename, fields.concat() + "\n");
+                });
+            });
+        });
+        return "done";
+    }, (err)=> {
+        console.log(err);
+        return (err)
+    });
+};
+
 
 module.exports.generateCsv = function () {
-    return rowsByAirportPerDay();
+    var perDay = rowsByAirportPerDay();
+    var perHour = rowsByAirportPerHour();
 };
