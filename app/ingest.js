@@ -44,6 +44,8 @@ var getData = function(file, airports, callback) {
                 lat: airports[waittime.Airport].lat,
                 lon: airports[waittime.Airport].lon
             };
+            waittime["lat"] = airports[waittime.Airport].lat;
+            waittime["lon"] = airports[waittime.Airport].lon;
             es.esClient().create({
                 index: 'cbp',
                 type: 'wait-times',

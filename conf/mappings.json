@@ -70,6 +70,12 @@
     },
     "location": {
       "type": "geo_point"
+    },
+    "lat": {
+      "type": "float"
+    },
+    "lon": {
+      "type": "float"
     }
   }
 }

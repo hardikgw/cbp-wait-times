@@ -3,6 +3,7 @@
 var express = require('express');
 var es = require('./elastic');
 var ingest = require('./ingest');
+var aggs = require('./aggregation');
 
 var app = express();
 
@@ -21,7 +22,7 @@ app.get('/index', function (req, res) {
 app.get('/mapping', function(req,rsp) {
     es.createIndex()
         .then((response) => {
-            console.log(response)
+            console.log(response);
             es.setMappings().then(
                 (response) => {
                     console.log(response);
@@ -36,4 +37,8 @@ app.get('/mapping', function(req,rsp) {
             console.log(err);
             rsp.send(err);
         });
+});
+
+app.get('/csv', function (req, res) {
+    res.send(aggs.generateCsv());
 });
