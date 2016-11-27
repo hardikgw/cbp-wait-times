@@ -1,3 +1,4 @@
+'use strict';
 var fs = require('fs');
 var parse = require('csv-parse');
 var es = require('./elastic');
@@ -11,6 +12,7 @@ var getAirports = function() {
         var airportparser = parse({columns: true});
         airportparser.on('readable', function () {
             var USAirports = ['US', 'AS', 'GU', 'MP', 'PR', 'CA'];
+            let airport;
             while (airport = airportparser.read()) {
                 if (USAirports.indexOf(airport.country_code)>-1) {
                     var cleanairport = _.omitBy(airport, _.isEmpty);
@@ -33,7 +35,7 @@ var getAirports = function() {
     });
 };
 
-var getData = function(file, airports, callback) {
+var getData = function(file, airports) {
     var errors = [];
     var created = 0;
     var errored = 0;

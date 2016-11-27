@@ -1,13 +1,15 @@
-var fs = require('fs');
-var parse = require('csv-parse');
-var es = require('./elastic');
-var _ = require('lodash');
-var basePath = '/Users/hp/workbench/projects/cbp/wait-times/data';
+'use strict';
 
+let fs = require('fs');
+let parse = require('csv-parse');
+let es = require('./elastic');
+let _ = require('lodash');
+let basePath = '/Users/hp/workbench/projects/cbp/wait-times/data';
+const FileWriter = require("./csv");
 
-var rowsByAirportPerDay = function () {
-    var filename = basePath + '/WaitTimesPerDay.csv';
-    fs.writeFileSync(filename, "Airport,LongDate,Date,AvgWait,MaxWait,Booths,Count,Lat,Lon" + "\n");
+let rowsByAirportPerDay = function () {
+    let wfilename = basePath + '/WaitTimesPerDay.csv';
+    let fw = new FileWriter.FileWriter(wfilename);
     es.esClient().search({
         index: 'cbp',
         size: 0,
@@ -68,17 +70,17 @@ var rowsByAirportPerDay = function () {
         var airports = results.aggregations.airport.buckets;
         airports.forEach((airport) => {
             airport.date.buckets.forEach((date)=> {
-                var fields = [];
-                fields.push(airport.key);
-                fields.push(date.key);
-                fields.push(date.key_as_string);
-                fields.push(date._Average.value);
-                fields.push(date._Max.value);
-                fields.push(date._Booths.value);
-                fields.push(date._Total.value);
-                fields.push(date._Lat.value);
-                fields.push(date._Lon.value);
-                fs.appendFileSync(filename, fields.concat() + "\n");
+                let fields = {};
+                fields["Airport"] = airport.key;
+                fields["LongDate"] = date.key;
+                fields["Date"] = date.key_as_string;
+                fields["AvgWait"] = date._Average.value;
+                fields["MaxWait"] = date._Max.value;
+                fields["Booths"] = date._Booths.value;
+                fields["Count"] = date._Total.value;
+                fields["Lat"] = date._Lat.value;
+                fields["Lon"] = date._Lon.value;
+                fw.write(fields);
             });
         });
         return "done";
@@ -89,9 +91,9 @@ var rowsByAirportPerDay = function () {
 };
 
 
-var rowsByAirportPerHour = function () {
-    var filename = basePath + '/WaitTimesPerHour.csv';
-    fs.writeFileSync(filename, "Airport,LongDate,Date,Hour,AvgWait,MaxWait,Booths,Count,Lat,Lon" + "\n");
+let rowsByAirportPerHour = function () {
+    let wfilename = basePath + '/WaitTimesPerHour.csv';
+    let fw = new FileWriter.FileWriter(wfilename);
     es.esClient().search({
         index: 'cbp',
         size: 0,
@@ -161,18 +163,18 @@ var rowsByAirportPerHour = function () {
         results.aggregations.airport.buckets.forEach((airport) => {
             airport.date.buckets.forEach((date)=> {
                 date.hour.buckets.forEach((hour)=> {
-                    var fields = [];
-                    fields.push(airport.key);
-                    fields.push(date.key);
-                    fields.push(date.key_as_string);
-                    fields.push(hour.key);
-                    fields.push(hour._Average.value);
-                    fields.push(hour._Max.value);
-                    fields.push(hour._Booths.value);
-                    fields.push(hour._Total.value);
-                    fields.push(hour._Lat.value);
-                    fields.push(hour._Lon.value);
-                    fs.appendFileSync(filename, fields.concat() + "\n");
+                    let fields = {};
+                    fields["Airport"] = airport.key;
+                    fields["LongDate"] = date.key;
+                    fields["Date"] = date.key_as_string;
+                    fields["Hour"] = hour.key;
+                    fields["AvgWait"] = hour._Average.value;
+                    fields["MaxWait"] = hour._Max.value;
+                    fields["Booths"] = hour._Booths.value;
+                    fields["Count"] = hour._Total.value;
+                    fields["Lat"] = hour._Lat.value;
+                    fields["Lon"] = hour._Lon.value;
+                    fw.write(fields);
                 });
             });
         });
@@ -185,6 +187,6 @@ var rowsByAirportPerHour = function () {
 
 
 module.exports.generateCsv = function () {
-    var perDay = rowsByAirportPerDay();
-    var perHour = rowsByAirportPerHour();
+    let perDay = rowsByAirportPerDay();
+    let perHour = rowsByAirportPerHour();
 };
