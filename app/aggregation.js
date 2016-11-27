@@ -1,6 +1,5 @@
 'use strict';
 
-let fs = require('fs');
 let parse = require('csv-parse');
 let es = require('./elastic');
 let _ = require('lodash');
@@ -30,32 +29,77 @@ let rowsByAirportPerDay = function () {
                                 size: 5000
                             },
                             aggs: {
-                                _Average: {
+                                AvgWait: {
                                     avg: {
                                         field: "Average"
                                     }
                                 },
-                                _Max: {
+                                MaxWait: {
                                     avg: {
                                         field: "Max"
                                     }
                                 },
-                                _Booths: {
+                                Booths: {
                                     avg: {
                                         field: "Booths"
                                     }
                                 },
-                                _Total: {
+                                Count: {
                                     sum: {
                                         field: "Total"
                                     }
                                 },
-                                _Lat: {
+                                "0-15": {
+                                    sum: {
+                                        field: "0-15"
+                                    }
+                                },
+                                "16-30": {
+                                    sum: {
+                                        field: "16-30"
+                                    }
+                                },
+                                "31-45": {
+                                    sum: {
+                                        field: "31-45"
+                                    }
+                                },
+                                "46-60": {
+                                    sum: {
+                                        field: "46-60"
+                                    }
+                                },
+                                "61-90": {
+                                    sum: {
+                                        field: "61-90"
+                                    }
+                                },
+                                "91-120": {
+                                    sum: {
+                                        field: "91-120"
+                                    }
+                                },
+                                "121Plus": {
+                                    sum: {
+                                        field: "121Plus"
+                                    }
+                                },
+                                Flights: {
+                                    sum: {
+                                        field: "Flights"
+                                    }
+                                },
+                                Excluded: {
+                                    sum: {
+                                        field: "Excluded"
+                                    }
+                                },
+                                Lat: {
                                     avg: {
                                         field: "lat"
                                     }
                                 },
-                                _Lon: {
+                                Lon: {
                                     avg: {
                                         field: "lon"
                                     }
@@ -74,12 +118,11 @@ let rowsByAirportPerDay = function () {
                 fields["Airport"] = airport.key;
                 fields["LongDate"] = date.key;
                 fields["Date"] = date.key_as_string;
-                fields["AvgWait"] = date._Average.value;
-                fields["MaxWait"] = date._Max.value;
-                fields["Booths"] = date._Booths.value;
-                fields["Count"] = date._Total.value;
-                fields["Lat"] = date._Lat.value;
-                fields["Lon"] = date._Lon.value;
+                for (let key of Object.keys(date)) {
+                    if (date[key] instanceof Object) {
+                        fields[key] = date[key].value;
+                    }
+                }
                 fw.write(fields);
             });
         });
@@ -120,32 +163,77 @@ let rowsByAirportPerHour = function () {
                                         size: 25
                                     },
                                     aggs: {
-                                        _Average: {
+                                        AvgWait: {
                                             avg: {
                                                 field: "Average"
                                             }
                                         },
-                                        _Max: {
+                                        MaxWait: {
                                             avg: {
                                                 field: "Max"
                                             }
                                         },
-                                        _Booths: {
+                                        Booths: {
                                             avg: {
                                                 field: "Booths"
                                             }
                                         },
-                                        _Total: {
+                                        Count: {
                                             sum: {
                                                 field: "Total"
                                             }
                                         },
-                                        _Lat: {
+                                        "0-15": {
+                                            sum: {
+                                                field: "0-15"
+                                            }
+                                        },
+                                        "16-30": {
+                                            sum: {
+                                                field: "16-30"
+                                            }
+                                        },
+                                        "31-45": {
+                                            sum: {
+                                                field: "31-45"
+                                            }
+                                        },
+                                        "46-60": {
+                                            sum: {
+                                                field: "46-60"
+                                            }
+                                        },
+                                        "61-90": {
+                                            sum: {
+                                                field: "61-90"
+                                            }
+                                        },
+                                        "91-120": {
+                                            sum: {
+                                                field: "91-120"
+                                            }
+                                        },
+                                        "121Plus": {
+                                            sum: {
+                                                field: "121Plus"
+                                            }
+                                        },
+                                        Flights: {
+                                            sum: {
+                                                field: "Flights"
+                                            }
+                                        },
+                                        Excluded: {
+                                            sum: {
+                                                field: "Excluded"
+                                            }
+                                        },
+                                        Lat: {
                                             avg: {
                                                 field: "lat"
                                             }
                                         },
-                                        _Lon: {
+                                        Lon: {
                                             avg: {
                                                 field: "lon"
                                             }
@@ -168,12 +256,11 @@ let rowsByAirportPerHour = function () {
                     fields["LongDate"] = date.key;
                     fields["Date"] = date.key_as_string;
                     fields["Hour"] = hour.key;
-                    fields["AvgWait"] = hour._Average.value;
-                    fields["MaxWait"] = hour._Max.value;
-                    fields["Booths"] = hour._Booths.value;
-                    fields["Count"] = hour._Total.value;
-                    fields["Lat"] = hour._Lat.value;
-                    fields["Lon"] = hour._Lon.value;
+                    for (let key of Object.keys(hour)) {
+                        if (hour[key] instanceof Object) {
+                            fields[key] = hour[key].value;
+                        }
+                    }
                     fw.write(fields);
                 });
             });
